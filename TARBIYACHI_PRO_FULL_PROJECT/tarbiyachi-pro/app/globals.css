@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: #F7F3E8; color: #303747; font-family: Arial, Helvetica, sans-serif; }
+button, input, select { font: inherit; }
+::selection { background: #A9DCC8; color: #303747; }
+.container { width: min(1160px, calc(100% - 40px)); margin-inline: auto; }
+.glass { background: rgba(255,255,255,.78); border: 1px solid rgba(255,255,255,.9); box-shadow: 0 14px 40px rgba(48,55,71,.07); }
+.hero-orb { position:absolute; border-radius:999px; filter: blur(1px); opacity:.7; pointer-events:none; }
+.soft-grid { background-image: radial-gradient(rgba(48,55,71,.10) 1px, transparent 1px); background-size: 22px 22px; }
+.btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:9px; background:#303747; color:white; padding:13px 19px; border-radius:15px; font-weight:700; transition:.2s; }
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 10px 22px rgba(48,55,71,.18); }
+.btn-secondary { display:inline-flex; align-items:center; justify-content:center; gap:8px; background:white; color:#303747; padding:12px 18px; border:1px solid #e8e5dc; border-radius:15px; font-weight:700; }
+.card { background:white; border:1px solid #eeeae1; border-radius:24px; box-shadow:0 10px 30px rgba(48,55,71,.05); }

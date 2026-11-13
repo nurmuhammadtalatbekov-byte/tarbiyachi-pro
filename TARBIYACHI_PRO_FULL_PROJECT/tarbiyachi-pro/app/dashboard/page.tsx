@@ -1,0 +1,23 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { Brand } from "@/components/Brand";
+import { BookOpen, CalendarDays, ChartNoAxesCombined, ClipboardList, LogOut, Sparkles, Trophy } from "lucide-react";
+import { signOut } from "./signout";
+
+export const metadata = { robots: { index: false, follow: false } };
+export default async function DashboardPage() {
+  const supabase=await createClient();
+  const {data:{user}}=await supabase.auth.getUser();
+  if(!user) redirect("/login");
+  const {data:profile}=await supabase.from("profiles").select("full_name,role,organization_type,region").eq("id",user.id).maybeSingle();
+  const {data:tests}=await supabase.from("weekly_tests").select("id,title,description,published_at").eq("status","published").order("published_at",{ascending:false}).limit(4);
+  const {data:attempts}=await supabase.from("attempts").select("id,score_percent,submitted_at").eq("user_id",user.id).not("submitted_at","is",null).order("submitted_at",{ascending:false}).limit(5);
+  return <main className="min-h-screen bg-[#F7F8F4]"><header className="border-b border-[#e9e9e2] bg-white"><div className="container flex h-[76px] items-center justify-between"><Brand/><div className="flex items-center gap-3"><span className="hidden text-sm text-muted sm:inline">{profile?.full_name||user.email}</span><form action={signOut}><button className="btn-secondary px-3 py-2 text-xs"><LogOut size={15}/> Chiqish</button></form></div></div></header>
+    <div className="container py-10"><div className="rounded-[28px] bg-[#E5F1E9] p-7 md:p-10"><div className="flex flex-wrap items-center justify-between gap-6"><div><span className="text-xs font-black tracking-widest text-[#688b77]">SHAXSIY O‘QUV MAKONI</span><h1 className="mt-3 text-3xl font-black md:text-4xl">Assalomu alaykum, {profile?.full_name?.split(" ")[0]||"pedagog"}!</h1><p className="mt-2 text-muted">Bugun bilimlaringizni yana bir qadam rivojlantiring.</p></div><div className="grid h-20 w-20 place-items-center rounded-[26px] bg-[#F7D66D] text-4xl">🌱</div></div></div>
+    <div className="mt-7 grid gap-5 lg:grid-cols-[1.35fr_.65fr]"><section className="space-y-5"><div className="flex items-center justify-between"><h2 className="text-xl font-black">Haftalik testlar</h2><span className="text-xs text-muted">Nashr qilingan testlar</span></div>
+    {tests?.length?<div className="grid gap-3">{tests.map(t=><div key={t.id} className="card flex flex-wrap items-center justify-between gap-4 p-5"><div><h3 className="font-extrabold">{t.title}</h3><p className="mt-1 text-sm text-muted">{t.description||"Bilimingizni sinab ko‘ring."}</p></div><Link href={`/tests/${t.id}`} className="btn-primary text-sm">Testni boshlash <ClipboardList size={16}/></Link></div>)}</div>:<div className="card p-6 text-sm leading-6 text-muted">Hozircha nashr qilingan haftalik test mavjud emas. Yangi testlar administrator tomonidan tasdiqlanib, e’lon qilingach shu yerda ko‘rinadi.</div>}
+    <h2 className="pt-3 text-xl font-black">Oxirgi natijalar</h2>{attempts?.length?<div className="card divide-y divide-[#f0eee8]">{attempts.map(a=><div key={a.id} className="flex items-center justify-between p-4"><span className="text-sm text-muted">{new Date(a.submitted_at).toLocaleDateString("uz-UZ")}</span><b className="text-lg">{a.score_percent}%</b></div>)}</div>:<div className="card p-5 text-sm text-muted">Hozircha topshirilgan test yo‘q. Birinchi testingizdan boshlang!</div>}</section>
+    <aside className="space-y-4"><div className="card p-6"><div className="flex items-center gap-3"><div className="grid h-11 w-11 place-items-center rounded-2xl bg-[#FFF0D1]"><Sparkles/></div><div><b>Shaxsiy profilingiz</b><p className="text-xs text-muted">Ma’lumotlarni to‘ldiring</p></div></div><p className="mt-4 text-sm leading-6 text-muted">Lavozim, hudud va MTT turini kiriting. Bu ma’lumotlar o‘quv yo‘nalishini moslashtirishga yordam beradi.</p><Link href="/profile" className="btn-secondary mt-4 w-full text-sm">Profilni sozlash</Link></div><div className="card p-6"><div className="flex items-center gap-3"><BookOpen className="text-[#719985]"/><b>O‘quv akademiyasi</b></div><p className="mt-3 text-sm text-muted">Pedagogika, psixologiya, qonunchilik va metodika bo‘yicha materiallar.</p><Link href="/academy" className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-[#688b77]">Mavzularni ko‘rish →</Link></div><div className="card p-6"><div className="flex items-center gap-3"><Trophy className="text-[#ad8c43]"/><b>Rivojlanish</b></div><p className="mt-3 text-sm text-muted">Natijalar va rivojlanish ko‘rsatkichlari test urinishlari to‘plangach shakllanadi.</p></div></aside></div>
+    </div></main>;
+}
